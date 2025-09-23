@@ -48,7 +48,6 @@ In this project, MCP is used to:
 
 This project leverages the **GitHub MCP Server** and its tools from [github/github-mcp-server](https://github.com/github/github-mcp-server) to interact with GitHub repositories programmatically.
 
-> This project uses MCP in a **practice/demo context**, showing how agents can be integrated into a web app without production-level deployment.
 ---
 
 ## Features
