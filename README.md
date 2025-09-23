@@ -1,6 +1,6 @@
 # GitHub Issues AI Agent 
 
-This project is a **practice/demo** for using **Google ADK (Agent Development Kit)** AI agents and **MCP (Multi-Channel Platform)** integration in a Django web application. It demonstrates how AI agents can interact with GitHub issues to create tickets and suggest fixes, including which files may need modification.
+This project is a **practice/demo** for using **Google ADK (Agent Development Kit)** AI agents and **MCP (Model Content Protocol)** integration in a Django web application. It demonstrates how AI agents can interact with GitHub issues to create tickets and suggest fixes, including which files may need modification.
 
 ---
 
@@ -32,14 +32,23 @@ This project uses ADK to create **GitHub Issue AI agents** for two main tasks:
 
 ## What is MCP?
 
-MCP (Multi-Channel Platform) is a Google ADK utility that helps agents interact with multiple data sources or outputs. In this project, MCP is used to:
-- Standardize communication between Django and AI agents
-- Provide input prompts to agents
-- Receive structured JSON outputs from agents
-- Handle replay-based and web-based queries to AI agents
+MCP (Model Context Protocol) is an open protocol that enables AI models and assistants to securely connect to external data sources, tools, and services. It provides a standardized way for AI agents to access real-world information and perform actions beyond their training data.
+
+**Key MCP Benefits:**
+- **Secure Integration:** Controlled access to external systems without exposing sensitive data
+- **Standardized Interface:** Consistent protocol for connecting AI models to various data sources
+- **Extensibility:** Support for custom tools and integrations
+- **Real-time Data:** Access to live data from APIs, databases, and services
+
+In this project, MCP is used to:
+- Enable secure communication between AI agents and GitHub's API
+- Provide structured access to GitHub repositories and issues
+- Handle authentication and data retrieval automatically
+- Ensure consistent data formatting between different systems
+
+This project leverages the **GitHub MCP Server** and its tools from [github/github-mcp-server](https://github.com/github/github-mcp-server) to interact with GitHub repositories programmatically.
 
 > This project uses MCP in a **practice/demo context**, showing how agents can be integrated into a web app without production-level deployment.
-
 ---
 
 ## Features
