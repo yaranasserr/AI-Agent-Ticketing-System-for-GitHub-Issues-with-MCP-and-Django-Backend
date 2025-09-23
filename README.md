@@ -87,7 +87,7 @@ github_issues_project/
 ### 1. Home Page
 **URL:** `http://127.0.0.1:9000/`
 
-![Home Page](demo/home.png)
+![Home Page](demo/create_ticket.png)
 
 The main interface where users can submit GitHub issue URLs to create tickets.
 
