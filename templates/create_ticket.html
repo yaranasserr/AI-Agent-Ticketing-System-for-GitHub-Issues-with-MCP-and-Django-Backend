@@ -1,0 +1,57 @@
+{% block content %}
+<div style="max-width:600px;margin:50px auto;font-family:sans-serif;">
+    <h2>Fetch GitHub Issues and Save as Tickets</h2>
+    <form id="ticket-form">
+        <div style="margin-bottom:10px;">
+            <label for="url">GitHub Repository or Issue URL:</label><br>
+            <input type="url" id="url" name="url" placeholder="https://github.com/owner/repo" required
+                   style="width:100%;padding:8px;margin-top:4px;">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label for="start_date">Start Date (optional):</label><br>
+            <input type="date" id="start_date" name="start_date" style="width:100%;padding:8px;margin-top:4px;">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label for="end_date">End Date (optional):</label><br>
+            <input type="date" id="end_date" name="end_date" style="width:100%;padding:8px;margin-top:4px;">
+        </div>
+        <button type="submit" style="padding:10px 20px;">Fetch & Save Tickets</button>
+    </form>
+
+    <div id="response" style="margin-top:20px;"></div>
+</div>
+
+<script>
+document.getElementById("ticket-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const url = document.getElementById("url").value;
+    const start_date = document.getElementById("start_date").value;
+    const end_date = document.getElementById("end_date").value;
+
+    let query = `?url=${encodeURIComponent(url)}`;
+    if (start_date) query += `&start_date=${start_date}`;
+    if (end_date) query += `&end_date=${end_date}`;
+
+    const responseDiv = document.getElementById("response");
+    responseDiv.innerHTML = "Fetching issues...";
+
+    try {
+        const res = await fetch(`/issues/create-tickets/${query}`, {
+    headers: {
+        "Accept": "application/json"
+    }
+});
+
+        const data = await res.json();
+        if (res.ok) {
+            responseDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+            responseDiv.innerHTML = `<span style="color:red;">Error: ${data.error}</span>`;
+        }
+    } catch (err) {
+        responseDiv.innerHTML = `<span style="color:red;">Network error: ${err}</span>`;
+    }
+});
+</script>
+{% endblock %}

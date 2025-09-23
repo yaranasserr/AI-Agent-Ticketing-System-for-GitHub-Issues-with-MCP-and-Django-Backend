@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggested Fix for Issue #{{ ticket.issue_number }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 20px; }
+        h2 { margin-top: 20px; }
+        p, li { line-height: 1.5; }
+        ul { padding-left: 20px; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-button { display: inline-block; margin-top: 20px; padding: 8px 16px; background: #007bff; color: white; border-radius: 4px; text-decoration: none; }
+        .back-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Suggested Fix for Issue #{{ ticket.issue_number }}</h1>
+
+        <p><strong>Title:</strong> {{ ticket.title }}</p>
+        <p><strong>GitHub Issue:</strong> 
+            <a href="https://github.com/{{ ticket.owner }}/{{ ticket.repo }}/issues/{{ ticket.issue_number }}" target="_blank">
+                #{{ ticket.issue_number }}
+            </a>
+        </p>
+
+        <h2>Suggested Fix:</h2>
+        <p>{{ suggested_fix.suggested_fix }}</p>
+
+        <h2>Files to Fix:</h2>
+        <ul>
+            {% for file in suggested_fix.files_to_fix %}
+                <li>
+                    <a href="https://github.com/{{ ticket.owner }}/{{ ticket.repo }}/blob/main/{{ file }}" target="_blank">
+                        {{ file }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>No files suggested</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'view_tickets' %}" class="back-button">Back to Tickets</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Issues Ticket System</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 700px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; }
+        form div { margin-bottom: 15px; }
+        input[type="url"], input[type="date"] { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; cursor: pointer; }
+        #response { margin-top: 20px; white-space: pre-wrap; }
+        .button-group { text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Issues Ticket System</h1>
+
+        <h2>Fetch Issues</h2>
+        <form id="ticket-form">
+            <div>
+                <label for="url">GitHub Repo or Issue URL:</label><br>
+                <input type="url" id="url" name="url" placeholder="https://github.com/owner/repo" required>
+            </div>
+            <div>
+                <label for="start_date">Start Date (optional):</label><br>
+                <input type="date" id="start_date" name="start_date">
+            </div>
+            <div>
+                <label for="end_date">End Date (optional):</label><br>
+                <input type="date" id="end_date" name="end_date">
+            </div>
+            <button type="submit">Fetch & Save Tickets</button>
+        </form>
+
+        <div id="response"></div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='/issues/view-tickets/'">View All Tickets</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("ticket-form").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const url = document.getElementById("url").value;
+            const start_date = document.getElementById("start_date").value;
+            const end_date = document.getElementById("end_date").value;
+
+            let query = `?url=${encodeURIComponent(url)}`;
+            if (start_date) query += `&start_date=${start_date}`;
+            if (end_date) query += `&end_date=${end_date}`;
+
+            const responseDiv = document.getElementById("response");
+            responseDiv.innerHTML = "Fetching issues...";
+
+            try {
+                const res = await fetch(`/issues/create-tickets/${query}`);
+                const data = await res.json();
+                if (res.ok) {
+                    responseDiv.innerHTML = `<strong>Saved Tickets IDs:</strong>\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    responseDiv.innerHTML = `<span style="color:red;">Error: ${data.error}</span>`;
+                }
+            } catch (err) {
+                responseDiv.innerHTML = `<span style="color:red;">Network error: ${err}</span>`;
+            }
+        });
+    </script>
+</body>
+</html>

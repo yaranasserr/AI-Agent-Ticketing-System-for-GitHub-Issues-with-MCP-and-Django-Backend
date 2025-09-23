@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Tickets</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 1000px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        h1 { text-align: center; }
+        .button-group { text-align: center; margin-top: 20px; }
+        select { width: 100%; padding: 4px; }
+        button { padding: 4px 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>All Tickets</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Repo</th>
+                    <th>Owner</th>
+                    <th>Issue #</th>
+                    <th>Title</th>
+                    <th>Labels</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Assign To</th>
+                    <th>Suggest Fix</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.repo }}</td>
+                    <td>{{ ticket.owner }}</td>
+                    <td>{{ ticket.issue_number }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.labels|join:", " }}</td>
+                    <td>{{ ticket.type }}</td>
+
+                    <!-- Status dropdown -->
+                    <td>
+                        <select class="status-dropdown" data-ticket-id="{{ ticket.id }}">
+                            <option value="unsolved" {% if ticket.status == "unsolved" %}selected{% endif %}>Unsolved</option>
+                            <option value="solved" {% if ticket.status == "solved" %}selected{% endif %}>Solved</option>
+                        </select>
+                    </td>
+
+                    <!-- Assignee dropdown -->
+                    <td>
+                        <select class="assignee-dropdown" data-ticket-id="{{ ticket.id }}">
+                            <option value="">--Select User--</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if ticket.assignee_id == user.id %}selected{% endif %}>{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+
+                    <!-- Suggest Fix button -->
+                   <td>
+    <button onclick="window.location.href='{% url 'suggest_fix_for_issue' ticket.id %}'">
+        View Suggestion
+    </button>
+</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" style="text-align:center;">No tickets found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="button-group">
+            <button onclick="window.location.href='/'">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        async function updateTicket(ticketId, field, value) {
+            try {
+                const res = await fetch(`/issues/update-ticket/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        ticket_id: ticketId,
+                        field: field,
+                        value: value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert("Error updating ticket: " + (data.error || "Unknown error"));
+                }
+            } catch (err) {
+                alert("Network error: " + err);
+            }
+        }
+
+        document.querySelectorAll('.status-dropdown').forEach(select => {
+            select.addEventListener('change', e => {
+                updateTicket(e.target.dataset.ticketId, 'status', e.target.value);
+            });
+        });
+
+        document.querySelectorAll('.assignee-dropdown').forEach(select => {
+            select.addEventListener('change', e => {
+                updateTicket(e.target.dataset.ticketId, 'assignee', e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
