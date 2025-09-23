@@ -33,7 +33,7 @@ Suggest a concise fix and which files to modify. Return ONLY a JSON object with:
         agent_dir = Path(__file__).parent.parent.parent / "adk_agents" / "github_suggest_fix"
         if not agent_dir.exists():
             logger.error(f"Agent directory not found at {agent_dir}")
-            return get_mock_suggested_fix(ticket)
+            return None
 
         # Create replay JSON file
         replay_data = {
@@ -64,6 +64,7 @@ Suggest a concise fix and which files to modify. Return ONLY a JSON object with:
             suggested_fix = parse_adk_output(result.stdout, ticket)
             if suggested_fix:
                 return suggested_fix
+
         logger.error(f"ADK CLI failed or no valid output. stdout: {result.stdout}, stderr: {result.stderr}")
 
     except subprocess.TimeoutExpired:
@@ -71,8 +72,8 @@ Suggest a concise fix and which files to modify. Return ONLY a JSON object with:
     except Exception as e:
         logger.error(f"ADK CLI execution failed: {e}")
 
-    # fallback
-    return get_mock_suggested_fix(ticket)
+    # If execution fails, return None
+    return None
 
 
 def parse_adk_output(output, ticket):
@@ -97,5 +98,3 @@ def parse_adk_output(output, ticket):
     except Exception as e:
         logger.error(f"Error parsing ADK output: {e}")
         return None
-
-
