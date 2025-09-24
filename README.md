@@ -8,7 +8,7 @@ This project is a **practice/demo** for using **Google ADK (Agent Development Ki
 
 ## System Design
 
-![System Architecture](demo/GithubMCP-Tickets.png)
+![System Architecture](demo/GithubMCP-Tickets (1).png)
 
 The diagram above illustrates the complete system architecture showing how Django, ADK agents, and MCP work together to process GitHub issues and generate AI-powered suggestions.
 
