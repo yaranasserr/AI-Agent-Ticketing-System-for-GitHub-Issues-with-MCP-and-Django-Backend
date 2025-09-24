@@ -24,10 +24,6 @@ def get_issues_from_url(url, start_date=None, end_date=None):
         # Find the agent directory (not the file)
         agent_dir = Path(__file__).parent.parent.parent / "adk_agents" / "github_mcp"
         
-        if not agent_dir.exists():
-            logger.error(f"Agent directory not found at {agent_dir}")
-            return get_mock_issues(url)
-        
         # Create a replay JSON file
         replay_data = {
             "state": {},
@@ -79,18 +75,7 @@ def get_issues_from_url(url, start_date=None, end_date=None):
         except Exception as e:
             logger.error(f"ADK CLI replay failed: {e}")
         
-        # Alternative approach: Try to use the web UI programmatically
-        try:
-            logger.info("Trying ADK web UI approach...")
-            result = start_adk_web_and_query(agent_dir, prompt_text)
-            if result:
-                return result
-        except Exception as e:
-            logger.error(f"ADK web UI approach failed: {e}")
-        
-        # If all methods fail, return mock data
-        logger.warning("All ADK execution methods failed, using mock data")
-        return get_mock_issues(url)
+       
         
     except Exception as e:
         logger.error(f"Error in replay integration: {str(e)}", exc_info=True)
@@ -100,53 +85,7 @@ def get_issues_from_url(url, start_date=None, end_date=None):
             'url': url
         }]
 
-def start_adk_web_and_query(agent_dir, prompt_text):
-    """
-    Start ADK web UI and try to query it programmatically.
-    This is experimental and might not work.
-    """
-    try:
-        import requests
-        import threading
-        import time
-        
-        # Start ADK web server in background
-        web_process = subprocess.Popen([
-            'adk', 'web', str(agent_dir), '--port', '8001'
-        ], 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE
-        )
-        
-        # Wait for server to start
-        time.sleep(5)
-        
-        try:
-            # Try to query the web interface
-            # Note: This is speculative - we'd need to check the actual API endpoints
-            response = requests.post('http://localhost:8001/chat', 
-                                   json={'message': prompt_text}, 
-                                   timeout=30)
-            
-            if response.status_code == 200:
-                result = response.json()
-                logger.info(f"ADK web API response: {result}")
-                return parse_web_response(result, prompt_text)
-            else:
-                logger.error(f"ADK web API failed with status {response.status_code}")
-        
-        except requests.RequestException as e:
-            logger.error(f"ADK web API request failed: {e}")
-        
-        finally:
-            # Clean up web server
-            web_process.terminate()
-            web_process.wait(timeout=5)
-    
-    except Exception as e:
-        logger.error(f"ADK web approach failed: {e}")
-    
-    return None
+
 
 def parse_adk_output(output, url):
     """Parse the output from ADK CLI"""
@@ -243,33 +182,3 @@ def fill_missing_fields(issue, url):
     
     return issue
 
-def get_mock_issues(url):
-    """Fallback mock issues for when CLI fails"""
-    import re
-    
-    github_match = re.match(r'https://github\.com/([^/]+)/([^/]+)', url)
-    if not github_match:
-        return [{
-            'error': 'Invalid GitHub URL format',
-            'url': url
-        }]
-    
-    owner = github_match.group(1)
-    repo = github_match.group(2)
-    
-    # Check if it's an issue URL
-    issue_match = re.search(r'/issues/(\d+)', url)
-    
-    if issue_match:
-        # Single issue URL
-        issue_number = int(issue_match.group(1))
-        return [{
-            'repo': repo,
-            'owner': owner,
-            'issue_number': issue_number,
-            'title': f'[MOCK] Issue #{issue_number} from {repo}',
-            'body': f'This is mock data for issue #{issue_number}. ADK CLI execution failed.',
-            'labels': ['mock', 'adk-fallback'],
-            'type': 'issue'
-        }]
- 
